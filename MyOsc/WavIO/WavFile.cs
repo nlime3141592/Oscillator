@@ -18,5 +18,15 @@ namespace WavIO
 
             return file;
         }
+
+        public static void Create(string _filePath, WavFile _wavFile)
+        {
+            FileStream fs = new FileStream(_filePath, FileMode.Create, FileAccess.Write);
+            BinaryWriter wr = new BinaryWriter(fs);
+            WavFileWriter wwr = new WavFileWriter(wr);
+
+            wwr.Save(_wavFile);
+            wwr.Close();
+        }
     }
 }

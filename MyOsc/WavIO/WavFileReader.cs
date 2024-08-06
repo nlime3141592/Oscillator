@@ -59,7 +59,7 @@ namespace WavIO
 
         private void Read_RIFF()
         {
-            uint fileSize = m_reader.ReadUInt32();
+            int fileSize = m_reader.ReadInt32();
 
             m_wavFile.header.fileSize = fileSize;
         }
@@ -71,24 +71,24 @@ namespace WavIO
 
         private void Read_JUNK()
         {
-            uint chunkSize = m_reader.ReadUInt32();
+            int chunkSize = m_reader.ReadInt32();
             m_reader.BaseStream.Seek(chunkSize, SeekOrigin.Current);
         }
 
         private void Read_fmtSpace()
         {
-            m_wavFile.header.lenFormatData = m_reader.ReadUInt32();
-            m_wavFile.header.formatType = m_reader.ReadUInt16();
-            m_wavFile.header.numChannel = m_reader.ReadUInt16();
-            m_wavFile.header.sampleRate = m_reader.ReadUInt32();
-            m_wavFile.header.sbc = m_reader.ReadUInt32();
-            m_wavFile.header.bc = m_reader.ReadUInt16();
-            m_wavFile.header.bitsPerSample = m_reader.ReadUInt16();
+            m_wavFile.header.lenFormatData = m_reader.ReadInt32();
+            m_wavFile.header.formatType = m_reader.ReadInt16();
+            m_wavFile.header.numChannel = m_reader.ReadInt16();
+            m_wavFile.header.sampleRate = m_reader.ReadInt32();
+            m_wavFile.header.sbc = m_reader.ReadInt32();
+            m_wavFile.header.bc = m_reader.ReadInt16();
+            m_wavFile.header.bitsPerSample = m_reader.ReadInt16();
         }
 
         private void Read_data()
         {
-            m_wavFile.header.dataSize = m_reader.ReadUInt32();
+            m_wavFile.header.dataSize = m_reader.ReadInt32();
             m_wavFile.data = m_reader.ReadBytes((int)m_wavFile.header.dataSize);
         }
     }

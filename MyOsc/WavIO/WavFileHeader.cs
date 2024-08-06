@@ -3,46 +3,46 @@
     public struct WavFileHeader
     {
         public string RIFF;
-        public uint fileSize;
+        public int fileSize;
         public string WAVE;
         public string fmtSpace;
-        public uint lenFormatData;
-        public ushort formatType;
-        public ushort numChannel;
-        public uint sampleRate;
-        public uint sbc; // NOTE: (sampleRate * bitsPerSample * numChannel) / 8
-        public ushort bc; // NOTE: (bitsPerSample * numChannel) / 8
-        public ushort bitsPerSample;
+        public int lenFormatData;
+        public short formatType;
+        public short numChannel;
+        public int sampleRate;
+        public int sbc; // NOTE: (sampleRate * bitsPerSample * numChannel) / 8
+        public short bc; // NOTE: (bitsPerSample * numChannel) / 8
+        public short bitsPerSample;
         public string data;
-        public uint dataSize;
+        public int dataSize;
 
-        public void SetDataSize(uint _dataSize)
+        public void SetDataSize(int _dataSize)
         {
             dataSize = _dataSize;
             fileSize = _dataSize + 36;
         }
 
-        public void SetSampleRate(uint _sampleRate)
+        public void SetSampleRate(int _sampleRate)
         {
             sampleRate = _sampleRate;
 
-            bc = (ushort)(bitsPerSample * numChannel);
+            bc = (short)(bitsPerSample * numChannel);
             sbc = sampleRate * bc;
         }
 
-        public void SetBitsPerSample(ushort _bitsPerSample)
+        public void SetBitsPerSample(short _bitsPerSample)
         {
             bitsPerSample = _bitsPerSample;
 
-            bc = (ushort)(bitsPerSample * numChannel);
+            bc = (short)(bitsPerSample * numChannel);
             sbc = sampleRate * bc;
         }
 
-        public void SetNumChannel(ushort _numChannel)
+        public void SetNumChannel(short _numChannel)
         {
             numChannel = _numChannel;
 
-            bc = (ushort)(bitsPerSample * numChannel);
+            bc = (short)(bitsPerSample * numChannel);
             sbc = sampleRate * bc;
         }
     }
