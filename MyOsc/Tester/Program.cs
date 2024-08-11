@@ -1,5 +1,6 @@
 ﻿using FourierAnalyzer;
 using System;
+using System.Diagnostics;
 using System.IO;
 using WavIO;
 
@@ -9,10 +10,65 @@ namespace MyOsc.Tester
     {
         private static void Main(string[] args)
         {
-            AnalyzeSignal("Music 001", 0, 1.0f, 20000.0f, 1.0f, 0);
+            AnalyzeSignal();
         }
 
-        private static void AnalyzeSignal(string _directoryName, int _srcDecibel, float _freqMin, float _freqMax, float _df, int _idxChannel)
+        private static void AnalyzeSignal()
+        {
+            string dirName = "Sine Wave (C5 Note)";
+            int srcDecibel = 0;
+            float freqMin = 1.0f;
+            float freqMax = 20000.0f;
+            float df = 1.0f;
+            int idxChannel = 0;
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            AnalyzeSignalDFT(dirName, srcDecibel, freqMin, freqMax, df, idxChannel);
+            watch.Stop();
+            Console.WriteLine("DFT Time: {0} ms", watch.ElapsedMilliseconds);
+            watch.Restart();
+            AnalyzeSignalFFT(dirName, srcDecibel, freqMin, freqMax, df, idxChannel);
+            watch.Stop();
+            Console.WriteLine("FFT Time: {0} ms", watch.ElapsedMilliseconds);
+        }
+
+        private static void AnalyzeSignalFFT(string _directoryName, int _srcDecibel, float _freqMin, float _freqMax, float _df, int _idxChannel)
+        {
+            string srcPath = GetPath(_directoryName, $"{_srcDecibel}dB.wav");
+            WavFile wav = WavFile.Load(srcPath);
+
+            FileStream fs = new FileStream("C:\\Programming\\Oscillator\\FFT.txt", FileMode.Create, FileAccess.Write);
+            StreamWriter wr = new StreamWriter(fs);
+
+            float[] coefficients = FourierTransformer.FFT(wav, _freqMin, _freqMax, _df, _idxChannel);
+
+            wr.WriteLine("DC: {0}", coefficients[0]);
+            wr.WriteLine("F == <frequency>: (<amplitude>, <phase>)");
+
+            float maxA = -1.0f;
+            float maxF = -1.0f;
+
+            for (int i = 1; i < coefficients.Length; i += 2)
+            {
+                float amp = MathF.Sqrt(coefficients[i] * coefficients[i] + coefficients[i + 1] * coefficients[i + 1]);
+                float phase = MathF.Atan(coefficients[i + 1] / coefficients[i]) * (180.0f / MathF.PI);
+                float freq = _freqMin + _df * (i / 2);
+
+                if (amp > maxA)
+                {
+                    maxA = amp;
+                    maxF = freq;
+                }
+
+                wr.WriteLine("F == {0}: ({1}, {2})", freq, amp, phase);
+            }
+
+            wr.WriteLine("MaxFreq == {0}, MaxAmp == {1}", maxF, maxA);
+            wr.Close();
+        }
+
+        private static void AnalyzeSignalDFT(string _directoryName, int _srcDecibel, float _freqMin, float _freqMax, float _df, int _idxChannel)
         {
             string srcPath = GetPath(_directoryName, $"{_srcDecibel}dB.wav");
             WavFile wav = WavFile.Load(srcPath);
@@ -20,7 +76,7 @@ namespace MyOsc.Tester
             FileStream fs = new FileStream("C:\\Programming\\Oscillator\\FT.txt", FileMode.Create, FileAccess.Write);
             StreamWriter wr = new StreamWriter(fs);
 
-            float[] coefficients = FourierTransformer.FT(wav, _freqMin, _freqMax, _df, _idxChannel);
+            float[] coefficients = FourierTransformer.DFT(wav, _freqMin, _freqMax, _df, _idxChannel);
 
             wr.WriteLine("DC: {0}", coefficients[0]);
             wr.WriteLine("F == <frequency>: (<amplitude>, <phase>)");
